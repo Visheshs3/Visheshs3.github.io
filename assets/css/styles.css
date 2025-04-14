@@ -133,16 +133,23 @@ img {
 .image > *:last-child{
     width: 100%;
 }
-.icons{
+.icons {
     display: flex;
     justify-content: center;
     height: 50px;
     gap: 20px;
     margin-bottom: 20px;
 }
-a > img {
-    width: 90%;
+
+.icons a {
     height: 100%;
+    aspect-ratio: 1 / 1; 
+}
+
+.icons a img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
 }
 
 .qualification{
