@@ -158,7 +158,24 @@
       `;
 
       document.getElementById("analysisOutput").innerHTML = outputHTML;
+
     }
+
+    // question 2
+
+    function event(eventType, element){
+        const time = new Date().toISOString();
+        const tag = element.tagName;
+        console.log(`${time} | ${eventType} | ${tag}`);
+    }
+
+    window.addEventListener("DOMContentLoaded", ()=>{
+        event("view", document.body);
+    })
+
+    document.addEventListener("click", e =>{
+        event("click", e.target);
+    })
   </script>
 </body>
 </html>
