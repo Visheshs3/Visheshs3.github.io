@@ -1,89 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body{
-            background-color: darkslategray;
-            color: rgb(206, 80, 80);
-        }
-        .text-analysis textarea {
-            width: 100%;
-            display: flex;
-            padding: 10px;
-            font-size: 16px;
-            background-color:rgb(169, 181, 191);
-            
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Text Analyzer</title>
+  <style>
+    body {
+      background-color: darkslategray;
+      color: rgb(206, 80, 80);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
 
-        }
-        h2{
-            display: block;
-            text-align: center;
-        }
-        button {
-            display: block;
-            background-color: aqua;
-            border: 1px black solid;
-            padding: 10px;
-            text-transform: capitalize;
-            font-weight: bolder;
-            margin: 0 auto;
-        }
-        #analysisOutput p, #analysisOutput li {
-            font-size: 18px;
-        }
-    </style>
+    section.text-analysis {
+      max-width: 960px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      background-color: rgb(169, 181, 191);
+      border: none;
+      border-radius: 6px;
+      resize: vertical;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      display: block;
+      background-color: aqua;
+      border: 1px black solid;
+      padding: 10px 20px;
+      text-transform: capitalize;
+      font-weight: bolder;
+      margin: 20px auto;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #analysisOutput {
+      margin-top: 30px;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    #analysisOutput h3 {
+      margin-top: 20px;
+      border-bottom: 1px solid rgb(206, 80, 80);
+      padding-bottom: 6px;
+    }
+
+    #analysisOutput ul {
+      list-style-type: disc;
+      margin-left: 20px;
+      padding-left: 0;
+    }
+
+    #analysisOutput li {
+      margin: 4px 0;
+      font-size: 17px;
+    }
+
+    .back-link {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    a {
+      color: rgb(206, 80, 80);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
-    <section class="text-analysis">
-        <h2>Text Analyzer</h2>
-        <textarea id="largeTextInput" rows="20" cols="100" placeholder="Write 10000+ words here ...."></textarea><br><br>
-        <button onclick="analyzeText()">Analyze Text</button>
-    
-        <div id="analysisOutput" style="margin-top: 20px;"></div>
-    </section>
+  <section class="text-analysis">
+    <h2>Text Analyzer</h2>
+    <textarea id="largeTextInput" rows="20" placeholder="Write 10000+ words here..."></textarea>
+    <button onclick="analyzeText()">Analyze Text</button>
+    <div id="analysisOutput"></div>
+  </section>
 
-    <script>
-        function analyzeText(){
-            const text = document.getElementById("largeTextInput").value;
-            const wordarr = text.trim().split(/\s+/);
-            const wordCount = wordarr.length;
-            const sentenceCount = (text.match(/[.!?](\s|$)/g) || []).length;
-            const charCount = text.length;
+  <div class="back-link">
+    <a href="index.html">Back to home page</a>
+  </div>
 
-            // frequency
+  <script>
+    const pronouns = ["i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "my", "your", "his", "its", "our", "their", "mine", "yours", "hers", "ours", "theirs"];
+    const prepositions = ["in", "on", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "over", "under", "again", "off"];
+    const articles = ["a", "an", "the"];
 
-            const frequency = {};
+    function analyzeText() {
+      const text = document.getElementById("largeTextInput").value;
 
-            wordarr.forEach(word => {
-                const cleanWord = word.toLowerCase().replace(/[^\w]/g, "");
-                if (cleanWord.length > 0) {
-                    frequency[cleanWord] = (frequency[cleanWord] || 0) + 1;
-                }
-            });
+      let letters = 0, words = 0, spaces = 0, newlines = 0, special = 0;
 
-            const sortedWords = Object.entries(frequency)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
+      for (let char of text) {
+        if (/[a-zA-Z]/.test(char)) letters++;
+        else if (char === ' ') spaces++;
+        else if (char === '\n') newlines++;
+        else if (/[^a-zA-Z0-9\s]/.test(char)) special++;
+      }
 
-                let output = `
-                <p><strong>Total Characters:</strong> ${charCount}</p>
-                <p><strong>Total Words:</strong> ${wordCount}</p>
-                <p><strong>Total Sentences:</strong> ${sentenceCount}</p>
-                <p><strong>Top ${sortedWords.length} Most Frequent Words:</strong></p>
-                <ul>
-            `;
+      words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
-            sortedWords.forEach(([word, count]) => {
-                output += `<li>${word} — ${count} times</li>`;
-            });
+      const tokens = text.toLowerCase().match(/\b\w+\b/g) || [];
 
-            output += `</ul>`;
+      const countByGroup = (group) => {
+        const counts = {};
+        for (let word of tokens) {
+          if (group.includes(word)) {
+            counts[word] = (counts[word] || 0) + 1;
+          }
+        }
+        return counts;
+      };
 
-            document.getElementById("analysisOutput").innerHTML = output;
-                }
-    </script>
+      const pronounCounts = countByGroup(pronouns);
+      const prepositionCounts = countByGroup(prepositions);
+      const articleCounts = countByGroup(articles);
+
+      const toList = (obj) =>
+        Object.entries(obj).length
+          ? Object.entries(obj).map(([k, v]) => `<li>${k}: ${v}</li>`).join('')
+          : `<li>None found</li>`;
+
+      const outputHTML = `
+        <h3>Basic Stats</h3>
+        <ul>
+          <li>Letters: ${letters}</li>
+          <li>Words: ${words}</li>
+          <li>Spaces: ${spaces}</li>
+          <li>Newlines: ${newlines}</li>
+          <li>Special Symbols: ${special}</li>
+        </ul>
+
+        <h3>Pronoun Counts</h3>
+        <ul>${toList(pronounCounts)}</ul>
+
+        <h3>Preposition Counts</h3>
+        <ul>${toList(prepositionCounts)}</ul>
+
+        <h3>Indefinite Article Counts</h3>
+        <ul>${toList(articleCounts)}</ul>
+      `;
+
+      document.getElementById("analysisOutput").innerHTML = outputHTML;
+    }
+  </script>
 </body>
 </html>
